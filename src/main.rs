@@ -1,10 +1,28 @@
 use std::fs::File;
 use std::io::Read;
-use rbx_types::Variant;
+use rbx_dom_weak::WeakDom;
+use rbx_dom_weak::Instance;
+
+fn get_terrain(model: &WeakDom) -> Result<&Instance, ()> {
+	let root = model.root();
+	for child_ref in root.children(){
+	    let inst = model.get_by_ref(*child_ref).unwrap();
+	    if *&inst.class == "Workspace" {
+		   for work_child_ref in inst.children(){
+			  let work_inst = model.get_by_ref(*work_child_ref).unwrap();
+			  if *&work_inst.class == "Terrain" {
+				 return Ok(&work_inst);
+			  }
+		   }
+	    }
+	}
+	return Err(());
+ }
+ 
 
 fn main() {
 	// Reads xml file
-	let mut file = match File::open("./test/input.xml") {
+	let mut file = match File::open("./test/input.rbxlx") {
 		Ok(file) => file,
 		Err(e) => {
 			println!("Error opening file: {}", e);
@@ -29,25 +47,12 @@ fn main() {
 	};
 
 	// Gets Terrain instance
-	let root = model.root();
-	let terrain_ref = root.children()[0];
-	let terrain = model.get_by_ref(terrain_ref).unwrap();
-	// println!("Class name {}", terrain.class);
-
-	// Get physics properties
-	for name in terrain.properties.keys() {
-	    let val_ref = match terrain.properties.get(name){
-		Some(val_ref) => {
-			if matches!(val_ref, Variant::BinaryString(_)) {
-				println!("{} = BinaryString", name);
-			};
-	
-		},
-		None => {
-		    println!("{} could not be opened", name);
+	let terrain = match get_terrain(&model){
+		Ok(terrain) => terrain,
+		Err(_) => {
+			println!("Error finding terrain");
+			return;
 		}
 	};
-}
-	
-
+	println!("Terrain {}", terrain.name)
 }
