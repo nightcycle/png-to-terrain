@@ -112,16 +112,6 @@ fn main() {
 	};
 	println!("Instance:- {}", terrain.name);
 
-	// Get the phys grid
-	let phys_grid_str: String = match get_bin_str_from_property(terrain, "PhysicsGrid"){
-		Ok(val_str) => val_str,
-		Err(_) => {
-			println!("Error getting binary string");
-			return;
-		}
-	};
-	println!("phys_grid: {}", &phys_grid_str);
-
 	// Get the smooth grid
 	let smooth_grid_str: String = match get_bin_str_from_property(terrain, "SmoothGrid"){
 		Ok(val_str) => val_str,

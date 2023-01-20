@@ -82,7 +82,7 @@
 		</Properties>
 		<Item class="Terrain" referent="RBX8CCB2F4A11C8456CA995DD5FEF913964">
 			<Properties>
-				<token name="AcquisitionMethod">3</token>
+				<token name="AcquisitionMethod">6</token>
 				<bool name="Anchored">true</bool>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<float name="BackParamA">-0.5</float>
@@ -134,9 +134,8 @@
 gcLgc4RKxr21zq2UlJSM]]></BinaryString>
 				<string name="MaterialVariantSerialized"></string>
 				<string name="Name">Terrain</string>
-				<BinaryString name="PhysicsGrid"><![CDATA[AgMAAAAI////////////////AAAAAAAAAAAAAAABAAD/AAD/AAD/AAH/AAAAAAAAAAAAAAAB
-AP//AP//AP//Af//AAAAAAAAAAAAAAABAAD/AAD/AAD/AAH/AAAAAAAAAAAAAAABAAAAAAAA
-AAA=]]></BinaryString>
+				<BinaryString name="PhysicsGrid"><![CDATA[AgMAAAAE//8A//8A//8A//8BAAAAAAAAAAAAAAEAAP8AAP8AAP8AAf8AAAAAAAAAAAAAAAEA
+AAAAAAAAAAA=]]></BinaryString>
 				<CoordinateFrame name="PivotOffset">
 					<X>0</X>
 					<Y>0</Y>
@@ -163,48 +162,27 @@ AAA=]]></BinaryString>
 					<Z>0</Z>
 				</Vector3>
 				<bool name="ShorelinesUpgraded">false</bool>
-				<BinaryString name="SmoothGrid"><![CDATA[AQX///////////////+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+Am48DgBuPA4Ab
-jwOAG48DgP+A/4D/gJvIqgOAG8iqA4AbyKoBgB3IqgGAAQAAAAAAAAAAAAAAAYD/gP+A/4D/
+				<BinaryString name="SmoothGrid"><![CDATA[AQX//wD//wD//wD//wCA/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
 gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
 gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
 gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
 gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4AbjwOAG48DgBuPA4AbjwOA/4D/gP+Am8iqAYAdyKoBgB3IqgGA
-HciqA4D/gP+A/4B/AAD/AAD/AAD/AAH/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
+AAAAAAAAAAAAAAEAgP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
 gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
 gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
 gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/wAAAAAAAAAAAAAAAYD/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP8A//8A//8A//8B//+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
+gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/wD/
+AAD/AAD/AAH/AID/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
 gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
 gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
 gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+Af48D
-gBuPA4AbjwOAG48DgP+A/4D/gJvIqgOAG8iqAoBcAAAAAAAAAAAAAAABgP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/jwOAG48DgBuPA4AbjwOA/4D/gP+A+8iqA4D/gP+A/4CbAAD/AAD/AAD/
-AAH/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
+gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP8AAAAA
+AAAAAAAAAQCA/4AfAoAeAoAeAoD/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
 /4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
 /4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
 /4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
-/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/wAAAAAAAAAAAAAA
-AYD/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
 /4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
-/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
-/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
-/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP8=]]></BinaryString>
+/4Ce]]></BinaryString>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 				<float name="TopParamA">-0.5</float>
@@ -238,27 +216,27 @@ AYD/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<CoordinateFrame name="CFrame">
-					<X>30.3665829</X>
-					<Y>34.5209999</Y>
-					<Z>-1.0968926</Z>
-					<R00>0.0681150183</R00>
-					<R01>-0.578395188</R01>
-					<R02>0.812907934</R02>
+					<X>-4.06588697</X>
+					<Y>29.731493</Y>
+					<Z>43.1908035</Z>
+					<R00>0.31713748</R00>
+					<R01>0.925540745</R01>
+					<R02>-0.206877246</R02>
 					<R10>-0</R10>
-					<R11>0.814800382</R11>
-					<R12>0.579741597</R12>
-					<R20>-0.997677565</R20>
-					<R21>-0.0394891091</R21>
-					<R22>0.0555001311</R22>
+					<R11>0.218137592</R11>
+					<R12>0.975918055</R12>
+					<R20>0.948379576</R20>
+					<R21>-0.309500188</R21>
+					<R22>0.0691796169</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
 				<float name="FieldOfView">70</float>
 				<token name="FieldOfViewMode">0</token>
 				<CoordinateFrame name="Focus">
-					<X>28.7407646</X>
-					<Y>33.361515</Y>
-					<Z>-1.20789301</Z>
+					<X>-3.65213299</X>
+					<Y>27.7796593</Y>
+					<Z>43.0524445</Z>
 					<R00>1</R00>
 					<R01>0</R01>
 					<R02>0</R02>
@@ -1023,23 +1001,23 @@ AYD/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
 			<UniqueId name="UniqueId">088d9b522dbaac3303d8b8830000551e</UniqueId>
 		</Properties>
 	</Item>
-	<Item class="PluginToolbar" referent="RBX518A62A1F3464594B541472EB151037E">
+	<Item class="PluginToolbar" referent="RBX2CBD6E353D874EA689C4EC47F5F0AC63">
 		<Properties>
 			<BinaryString name="AttributesSerialize"></BinaryString>
 			<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
 			<string name="Name">Graph Editor</string>
 			<int64 name="SourceAssetId">-1</int64>
 			<BinaryString name="Tags"></BinaryString>
-			<UniqueId name="UniqueId">0049706fdddb742d03db81ec00004998</UniqueId>
+			<UniqueId name="UniqueId">2399f518ba2e827603dbacc6000042f5</UniqueId>
 		</Properties>
-		<Item class="PluginToolbarButton" referent="RBXD22170B8FD2D46C9BB3AC852396D5155">
+		<Item class="PluginToolbarButton" referent="RBX55B1D50A63B34183BB74C9946D83A6D9">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
 				<string name="Name">Button</string>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
-				<UniqueId name="UniqueId">0049706fdddb742d03db81ec00004999</UniqueId>
+				<UniqueId name="UniqueId">2399f518ba2e827603dbacc6000042f6</UniqueId>
 			</Properties>
 		</Item>
 	</Item>
