@@ -4,7 +4,6 @@
 	<Item class="Workspace" referent="RBX770239B7670D496DB10B7805B5E27F67">
 		<Properties>
 			<bool name="AllowThirdPartySales">false</bool>
-			<token name="AnimationWeightedBlendFix">0</token>
 			<BinaryString name="AttributesSerialize"></BinaryString>
 			<token name="ClientAnimatorThrottling">0</token>
 			<BinaryString name="CollisionGroupData">AQEABP////8HRGVmYXVsdA==</BinaryString>
@@ -51,6 +50,7 @@
 			<token name="RejectCharacterDeletions">0</token>
 			<token name="ReplicateInstanceDestroySetting">0</token>
 			<token name="Retargeting">0</token>
+			<float name="ScaleFactor">1</float>
 			<token name="SignalBehavior">0</token>
 			<int64 name="SourceAssetId">-1</int64>
 			<token name="StreamOutBehavior">0</token>
@@ -61,7 +61,6 @@
 			<BinaryString name="Tags"></BinaryString>
 			<bool name="TerrainWeldsFixed">true</bool>
 			<bool name="TouchesUseCollisionGroups">false</bool>
-			<token name="UnionsScaleNonuniformly">0</token>
 			<UniqueId name="UniqueId">088d9b522dbaac3303d8b88300000002</UniqueId>
 			<OptionalCoordinateFrame name="WorldPivotData">
 				<CFrame>
@@ -134,8 +133,8 @@
 gcLgc4RKxr21zq2UlJSM]]></BinaryString>
 				<string name="MaterialVariantSerialized"></string>
 				<string name="Name">Terrain</string>
-				<BinaryString name="PhysicsGrid"><![CDATA[AgMAAAAE//8A//8A//8A//8BAAAAAAAAAAAAAAEAAP8AAP8AAP8AAf8AAAAAAAAAAAAAAAEA
-AAAAAAAAAAA=]]></BinaryString>
+				<BinaryString name="PhysicsGrid"><![CDATA[AgMAAAAG//8A//8A//8A//8BAAAAAAAAAAAAAAEAAP8AAP8AAP8AAf8AAAAAAAAAAAAAAAEA
+AP8AAP8AAP8AAf8AAAAAAAAAAAAAAAEAAAAAAAAAAAA=]]></BinaryString>
 				<CoordinateFrame name="PivotOffset">
 					<X>0</X>
 					<Y>0</Y>
@@ -162,27 +161,13 @@ AAAAAAAAAAA=]]></BinaryString>
 					<Z>0</Z>
 				</Vector3>
 				<bool name="ShorelinesUpgraded">false</bool>
-				<BinaryString name="SmoothGrid"><![CDATA[AQX//wD//wD//wD//wCA/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-AAAAAAAAAAAAAAEAgP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/wD/
-AAD/AAD/AAH/AID/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/
-gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP8AAAAA
-AAAAAAAAAQCA/4AfAoAeAoAeAoD/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
+				<BinaryString name="SmoothGrid"><![CDATA[AQUAAAAAAAAAAAAAAACA/4AfAoAJAkJNgBICQldCMoAHQplCgIASAkKegguA/4D/gP+AvMJN
+AYAdQoBCmYAUQgSAB4IBgP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
 /4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
 /4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
 /4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
-/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
-/4Ce]]></BinaryString>
+/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4CS]]></BinaryString>
+				<bool name="SmoothVoxelsUpgraded">false</bool>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 				<float name="TopParamA">-0.5</float>
@@ -216,27 +201,27 @@ AAAAAAAAAQCA/4AfAoAeAoAeAoD/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<CoordinateFrame name="CFrame">
-					<X>-4.06588697</X>
-					<Y>29.731493</Y>
-					<Z>43.1908035</Z>
-					<R00>0.31713748</R00>
-					<R01>0.925540745</R01>
-					<R02>-0.206877246</R02>
-					<R10>-0</R10>
-					<R11>0.218137592</R11>
-					<R12>0.975918055</R12>
-					<R20>0.948379576</R20>
-					<R21>-0.309500188</R21>
-					<R22>0.0691796169</R22>
+					<X>44.0215225</X>
+					<Y>75.0638123</Y>
+					<Z>153.003967</Z>
+					<R00>0.986854553</R00>
+					<R01>-0.0626321509</R01>
+					<R02>0.148981497</R02>
+					<R10>3.7252903e-09</R10>
+					<R11>0.921849787</R11>
+					<R12>0.387547612</R12>
+					<R20>-0.161611497</R20>
+					<R21>-0.382453114</R21>
+					<R22>0.909731507</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
 				<float name="FieldOfView">70</float>
 				<token name="FieldOfViewMode">0</token>
 				<CoordinateFrame name="Focus">
-					<X>-3.65213299</X>
-					<Y>27.7796593</Y>
-					<Z>43.0524445</Z>
+					<X>43.7235603</X>
+					<Y>74.2887192</Y>
+					<Z>151.184509</Z>
 					<R00>1</R00>
 					<R01>0</R01>
 					<R02>0</R02>
@@ -254,6 +239,26 @@ AAAAAAAAAQCA/4AfAoAeAoAeAoD/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 				<UniqueId name="UniqueId">088d9b522dbaac3303d8b88300007a83</UniqueId>
+			</Properties>
+		</Item>
+		<Item class="Folder" referent="RBX7BC51FD54DDD4BBB882D675C1A5CDB71">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+				<string name="Name">TerrainCursorPart</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<UniqueId name="UniqueId">19bca6f43b0b434f0424adaa0000481c</UniqueId>
+			</Properties>
+		</Item>
+		<Item class="Folder" referent="RBXD8CA807D8986430CBB4DF9B617CC4111">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+				<string name="Name">TerrainCursorPart</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<UniqueId name="UniqueId">4bbd023005881ce10424b9fd00004c08</UniqueId>
 			</Properties>
 		</Item>
 	</Item>
@@ -659,6 +664,7 @@ AAAAAAAAAQCA/4AfAoAeAoAeAoD/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
 			<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
 			<string name="Name">StarterGui</string>
 			<bool name="ResetPlayerGuiOnSpawn">true</bool>
+			<token name="RtlTextSupport">0</token>
 			<token name="ScreenOrientation">2</token>
 			<bool name="ShowDevelopmentGui">true</bool>
 			<int64 name="SourceAssetId">-1</int64>
@@ -873,16 +879,6 @@ AAAAAAAAAQCA/4AfAoAeAoAeAoD/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
 			<UniqueId name="UniqueId">088d9b522dbaac3303d8b88300000327</UniqueId>
 		</Properties>
 	</Item>
-	<Item class="Instance" referent="RBXC68549BAF0974A48A2826187A8FFA398">
-		<Properties>
-			<BinaryString name="AttributesSerialize"></BinaryString>
-			<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
-			<string name="Name">SelectionHighlightManager</string>
-			<int64 name="SourceAssetId">-1</int64>
-			<BinaryString name="Tags"></BinaryString>
-			<UniqueId name="UniqueId">088d9b522dbaac3303d8b88300000328</UniqueId>
-		</Properties>
-	</Item>
 	<Item class="LuaWebService" referent="RBX2772BA681FC24BA18A1C62C200291A36">
 		<Properties>
 			<BinaryString name="AttributesSerialize"></BinaryString>
@@ -901,16 +897,6 @@ AAAAAAAAAQCA/4AfAoAeAoAeAoD/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
 			<int64 name="SourceAssetId">-1</int64>
 			<BinaryString name="Tags"></BinaryString>
 			<UniqueId name="UniqueId">088d9b522dbaac3303d8b8830000032e</UniqueId>
-		</Properties>
-	</Item>
-	<Item class="LanguageService" referent="RBXF242D8F503954255AD954766F66328F6">
-		<Properties>
-			<BinaryString name="AttributesSerialize"></BinaryString>
-			<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
-			<string name="Name">LanguageService</string>
-			<int64 name="SourceAssetId">-1</int64>
-			<BinaryString name="Tags"></BinaryString>
-			<UniqueId name="UniqueId">088d9b522dbaac3303d8b8830000033d</UniqueId>
 		</Properties>
 	</Item>
 	<Item class="Lighting" referent="RBX2824E0C1707C45A085E8769BC0A04ECB">
@@ -970,6 +956,16 @@ AAAAAAAAAQCA/4AfAoAeAoAeAoD/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
 			<UniqueId name="UniqueId">088d9b522dbaac3303d8b88300000345</UniqueId>
 		</Properties>
 	</Item>
+	<Item class="LanguageService" referent="RBXF242D8F503954255AD954766F66328F6">
+		<Properties>
+			<BinaryString name="AttributesSerialize"></BinaryString>
+			<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+			<string name="Name">LanguageService</string>
+			<int64 name="SourceAssetId">-1</int64>
+			<BinaryString name="Tags"></BinaryString>
+			<UniqueId name="UniqueId">088d9b522dbaac3303d8b8830000033d</UniqueId>
+		</Properties>
+	</Item>
 	<Item class="HttpService" referent="RBX7AFA3CF07CDE4718AB2EFEA513570BAD">
 		<Properties>
 			<BinaryString name="AttributesSerialize"></BinaryString>
@@ -1001,23 +997,23 @@ AAAAAAAAAQCA/4AfAoAeAoAeAoD/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A
 			<UniqueId name="UniqueId">088d9b522dbaac3303d8b8830000551e</UniqueId>
 		</Properties>
 	</Item>
-	<Item class="PluginToolbar" referent="RBX2CBD6E353D874EA689C4EC47F5F0AC63">
+	<Item class="PluginToolbar" referent="RBXBBB0F32EDE6F42D2B0A98D368881EF1D">
 		<Properties>
 			<BinaryString name="AttributesSerialize"></BinaryString>
 			<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
 			<string name="Name">Graph Editor</string>
 			<int64 name="SourceAssetId">-1</int64>
 			<BinaryString name="Tags"></BinaryString>
-			<UniqueId name="UniqueId">2399f518ba2e827603dbacc6000042f5</UniqueId>
+			<UniqueId name="UniqueId">4bbd023005881ce10424b9fd0000425b</UniqueId>
 		</Properties>
-		<Item class="PluginToolbarButton" referent="RBX55B1D50A63B34183BB74C9946D83A6D9">
+		<Item class="PluginToolbarButton" referent="RBX9F7B81217FEC43E89F23CD09316BB535">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
 				<string name="Name">Button</string>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
-				<UniqueId name="UniqueId">2399f518ba2e827603dbacc6000042f6</UniqueId>
+				<UniqueId name="UniqueId">4bbd023005881ce10424b9fd0000425c</UniqueId>
 			</Properties>
 		</Item>
 	</Item>
