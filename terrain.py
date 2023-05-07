@@ -37,8 +37,8 @@ def decode_material_colors(binary_str: str) -> dict[str: str]:
 	colors = []
 	color_values = decode_binary_string(binary_str)
 	mat_order = [
-		"_0",
-		"_1",
+		"Air",
+		"Water",
 		"Grass",
 		"Slate",
 		"Concrete",
@@ -120,6 +120,7 @@ def binary_to_bytes(s: bytes):
     return bytes(b[::-1])
 
 smooth_grid_bytes = get_bytes_from_binary_str(smooth_grid_bin_str)
+
 def get_byte_run_info(index: int):
 
 	lead_byte = extract_byte(index, smooth_grid_bytes)
