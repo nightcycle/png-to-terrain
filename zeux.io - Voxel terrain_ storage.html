@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<!-- saved from url=(0049)https://zeux.io/2017/03/27/voxel-terrain-storage/ -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script src="chrome-extension://fdjamakpfbbddfjaooikfcpapjohcfmg/content/pageScripts/dashlane-tiresias-page-script.js" id="dashlane_tiresias"></script><script src="chrome-extension://fdjamakpfbbddfjaooikfcpapjohcfmg/content/pageScripts/dashlane-webauthn-page-script.js" id="dashlane_webauthn" name="forward_webauthn_ready"></script>
+  <link href="https://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  
+
+  <!-- Twitter cards -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Voxel terrain: storage">
+
+  
+  <meta name="twitter:description" content="It’s been about almost two years since we shipped the first version of smooth voxel terrain at Roblox, and with it being live for a while and seeing a lot of incremental improvements I wanted to write about the internals of the technology - this feature required implementing serialization, network replication, collision detection, ray casting, rendering and in-memory storage support and within each area some implementation details ended up being quite interesting. Today we’ll talk about voxel definition and storage.
+
+">
+  
+  <meta name="twitter:image" content="https://zeux.io/images/avatar.jpg">
+  <!-- end of Twitter cards -->
+
+  <!-- OpenGraph metadata -->
+  <meta property="og:title" content="Voxel terrain: storage">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://zeux.io/2017/03/27/voxel-terrain-storage/">
+
+  
+  <meta property="og:description" content="It’s been about almost two years since we shipped the first version of smooth voxel terrain at Roblox, and with it being live for a while and seeing a lot of incremental improvements I wanted to write about the internals of the technology - this feature required implementing serialization, network replication, collision detection, ray casting, rendering and in-memory storage support and within each area some implementation details ended up being quite interesting. Today we’ll talk about voxel definition and storage.
+
+">
+  
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    zeux.io - Voxel terrain: storage
+  </title>
+
+  <!-- Disable favicon -->
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+  <!-- CSS -->
+  <style type="text/css">
+  @font-face {
+    font-family: 'PT Sans'; font-style: normal; font-weight: 400;
+    font-display: fallback;
+    src: local('PT Sans'), local('PTSans-Regular'), url(/fonts/pt_sans-web-regular-webfont.woff) format('woff');
+  }
+  @font-face {
+    font-family: 'PT Sans'; font-style: normal; font-weight: 700;
+    font-display: fallback;
+    src: local('PT Sans Bold'), local('PTSans-Bold'), url(/fonts/pt_sans-web-bold-webfont.woff) format('woff');
+  }
+  @font-face {
+    font-family: 'PT Sans'; font-style: italic; font-weight: 400;
+    font-display: fallback;
+    src: local('PT Sans Italic'), local('PTSans-Italic'), url(/fonts/pt_sans-web-italic-webfont.woff) format('woff');
+  }
+
+  /*
+ *                        ___
+ *                       /\_ \
+ *  _____     ___     ___\//\ \      __
+ * /\ '__`\  / __`\  / __`\\ \ \   /'__`\
+ * \ \ \_\ \/\ \_\ \/\ \_\ \\_\ \_/\  __/
+ *  \ \ ,__/\ \____/\ \____//\____\ \____\
+ *   \ \ \/  \/___/  \/___/ \/____/\/____/
+ *    \ \_\
+ *     \/_/
+ *
+ * Designed, built, and released under MIT license by @mdo. Learn more at
+ * https://github.com/poole/poole.
+ */
+
+
+/*
+ * Contents
+ *
+ * Body resets
+ * Custom type
+ * Messages
+ * Container
+ * Masthead
+ * Posts and pages
+ * Pagination
+ * Reverse layout
+ * Themes
+ */
+
+
+/*
+ * Body resets
+ *
+ * Update the foundational and global aspects of the page.
+ */
+
+* {
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+@media (min-width: 38em) {
+  html {
+    font-size: 18px;
+  }
+}
+
+body {
+  color: #515151;
+  background-color: #fff;
+  -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+}
+
+/* No `:visited` state is required by default (browsers will use `a`) */
+a {
+  color: #268bd2;
+  text-decoration: none;
+}
+a strong {
+  color: inherit;
+}
+/* `:focus` is linked to `:hover` for basic accessibility */
+a:hover,
+a:focus {
+  text-decoration: underline;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: .5rem;
+  font-weight: bold;
+  line-height: 1.25;
+  color: #313131;
+  text-rendering: optimizeLegibility;
+  clear: left;
+}
+h1 {
+  font-size: 2rem;
+}
+h2 {
+  margin-top: 1rem;
+  font-size: 1.5rem;
+}
+h3 {
+  margin-top: 1.5rem;
+  font-size: 1.25rem;
+}
+h4, h5, h6 {
+  margin-top: 1rem;
+  font-size: 1rem;
+}
+
+/* Body text */
+p {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+strong {
+  color: #303030;
+}
+
+
+/* Lists */
+ul, ol, dl {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+dt {
+  font-weight: bold;
+}
+dd {
+  margin-bottom: .5rem;
+}
+
+/* Misc */
+hr {
+  position: relative;
+  margin: 1.5rem 0;
+  border: 0;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #fff;
+}
+
+abbr {
+  font-size: 85%;
+  font-weight: bold;
+  color: #555;
+  text-transform: uppercase;
+}
+abbr[title] {
+  cursor: help;
+  border-bottom: 1px dotted #e5e5e5;
+}
+
+/* Code */
+code,
+pre {
+  font-family: Menlo, Monaco, "Courier New", monospace;
+}
+code {
+  padding: .25em .5em;
+  font-size: 85%;
+  color: #bf616a;
+  background-color: #f9f9f9;
+  border-radius: 3px;
+}
+pre {
+  display: block;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  font-size: .8rem;
+  line-height: 1.4;
+  white-space: pre;
+  white-space: pre-wrap;
+  word-break: break-all;
+  word-wrap: break-word;
+  background-color: #f9f9f9;
+}
+pre code {
+  padding: 0;
+  font-size: 100%;
+  color: inherit;
+  background-color: transparent;
+}
+
+/* Pygments via Jekyll */
+.highlight {
+  margin-bottom: 1rem;
+  border-radius: 4px;
+}
+.highlight pre {
+  margin-bottom: 0;
+}
+
+/* Gist via GitHub Pages */
+.gist .gist-file {
+  font-family: Menlo, Monaco, "Courier New", monospace !important;
+}
+.gist .markdown-body {
+  padding: 15px;
+}
+.gist pre {
+  padding: 0;
+  background-color: transparent;
+}
+.gist .gist-file .gist-data {
+  font-size: .8rem !important;
+  line-height: 1.4;
+}
+.gist code {
+  padding: 0;
+  color: inherit;
+  background-color: transparent;
+  border-radius: 0;
+}
+
+/* Quotes */
+blockquote {
+  padding: .5rem 1rem;
+  margin: .8rem 0;
+  color: #7a7a7a;
+  border-left: .25rem solid #e5e5e5;
+}
+blockquote p:last-child {
+  margin-bottom: 0;
+}
+@media (min-width: 30em) {
+  blockquote {
+    padding-right: 5rem;
+    padding-left: 1.25rem;
+  }
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  margin: 0 0 1rem;
+  border-radius: 5px;
+}
+
+/* Tables */
+table {
+  margin-bottom: 1rem;
+  width: 100%;
+  border: 1px solid #e5e5e5;
+  border-collapse: collapse;
+}
+td,
+th {
+  padding: .25rem .5rem;
+  border: 1px solid #e5e5e5;
+}
+tbody tr:nth-child(odd) td,
+tbody tr:nth-child(odd) th {
+  background-color: #f9f9f9;
+}
+
+
+/*
+ * Custom type
+ *
+ * Extend paragraphs with `.lead` for larger introductory text.
+ */
+
+.lead {
+  font-size: 1.25rem;
+  font-weight: 300;
+}
+
+
+/*
+ * Messages
+ *
+ * Show alert messages to users. You may add it to single elements like a `<p>`,
+ * or to a parent if there are multiple elements to show.
+ */
+
+.message {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  color: #717171;
+  background-color: #f9f9f9;
+}
+
+
+/*
+ * Container
+ *
+ * Center the page content.
+ */
+
+.container {
+  max-width: 38rem;
+  padding-left:  1rem;
+  padding-right: 1rem;
+  margin-left:  auto;
+  margin-right: auto;
+}
+
+
+/*
+ * Masthead
+ *
+ * Super small header above the content for site name and short description.
+ */
+
+.masthead {
+  padding-top:    1rem;
+  padding-bottom: 1rem;
+  margin-bottom: 3rem;
+}
+.masthead-title {
+  margin-top: 0;
+  margin-bottom: 0;
+  color: #505050;
+}
+.masthead-title a {
+  color: #505050;
+}
+.masthead-title small {
+  font-size: 75%;
+  font-weight: 400;
+  color: #c0c0c0;
+  letter-spacing: 0;
+}
+
+
+/*
+ * Posts and pages
+ *
+ * Each post is wrapped in `.post` and is used on default and post layouts. Each
+ * page is wrapped in `.page` and is only used on the page layout.
+ */
+
+.page,
+.post {
+  margin-bottom: 4em;
+}
+
+/* Blog post or page title */
+.page-title,
+.post-title,
+.post-title a {
+  color: #303030;
+}
+.page-title,
+.post-title {
+  margin-top: 0;
+}
+
+/* Meta data line below post title */
+.post-date {
+  display: block;
+  margin-top: -.5rem;
+  margin-bottom: 1rem;
+  color: #9a9a9a;
+}
+
+/* Related posts */
+.related {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  border-top: 1px solid #eee;
+}
+.related-posts {
+  padding-left: 0;
+  list-style: none;
+}
+.related-posts h3 {
+  margin-top: 0;
+}
+.related-posts li small {
+  font-size: 75%;
+  color: #999;
+}
+.related-posts li a:hover {
+  color: #268bd2;
+  text-decoration: none;
+}
+.related-posts li a:hover small {
+  color: inherit;
+}
+
+
+/*
+ * Pagination
+ *
+ * Super lightweight (HTML-wise) blog pagination. `span`s are provide for when
+ * there are no more previous or next posts to show.
+ */
+
+.pagination {
+  overflow: hidden; /* clearfix */
+  margin-left: -1rem;
+  margin-right: -1rem;
+  font-family: "PT Sans", Helvetica, Arial, sans-serif;
+  color: #ccc;
+  text-align: center;
+}
+
+/* Pagination items can be `span`s or `a`s */
+.pagination-item {
+  display: block;
+  padding: 1rem;
+  border: 1px solid #eee;
+}
+.pagination-item:first-child {
+  margin-bottom: -1px;
+}
+
+/* Only provide a hover state for linked pagination items */
+a.pagination-item:hover {
+  background-color: #f5f5f5;
+}
+
+@media (min-width: 30em) {
+  .pagination {
+    margin: 3rem 0;
+  }
+  .pagination-item {
+    float: left;
+    width: 50%;
+  }
+  .pagination-item:first-child {
+    margin-bottom: 0;
+    border-top-left-radius:    4px;
+    border-bottom-left-radius: 4px;
+  }
+  .pagination-item:last-child {
+    margin-left: -1px;
+    border-top-right-radius:    4px;
+    border-bottom-right-radius: 4px;
+  }
+}
+
+  .highlight .hll { background-color: #ffc; }
+.highlight .c { color: #999; } /* Comment */
+.highlight .err { color: #a00; background-color: #faa } /* Error */
+.highlight .k { color: #069; } /* Keyword */
+.highlight .o { color: #555 } /* Operator */
+.highlight .cm { color: #09f; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #099 } /* Comment.Preproc */
+.highlight .c1 { color: #999; } /* Comment.Single */
+.highlight .cs { color: #999; } /* Comment.Special */
+.highlight .gd { background-color: #fcc; border: 1px solid #c00 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #f00 } /* Generic.Error */
+.highlight .gh { color: #030; } /* Generic.Heading */
+.highlight .gi { background-color: #cfc; border: 1px solid #0c0 } /* Generic.Inserted */
+.highlight .go { color: #aaa } /* Generic.Output */
+.highlight .gp { color: #009; } /* Generic.Prompt */
+.highlight .gs { } /* Generic.Strong */
+.highlight .gu { color: #030; } /* Generic.Subheading */
+.highlight .gt { color: #9c6 } /* Generic.Traceback */
+.highlight .kc { color: #069; } /* Keyword.Constant */
+.highlight .kd { color: #069; } /* Keyword.Declaration */
+.highlight .kn { color: #069; } /* Keyword.Namespace */
+.highlight .kp { color: #069 } /* Keyword.Pseudo */
+.highlight .kr { color: #069; } /* Keyword.Reserved */
+.highlight .kt { color: #078; } /* Keyword.Type */
+.highlight .m { color: #f60 } /* Literal.Number */
+.highlight .s { color: #d44950 } /* Literal.String */
+.highlight .na { color: #4f9fcf } /* Name.Attribute */
+.highlight .nb { color: #366 } /* Name.Builtin */
+.highlight .nc { color: #0a8; } /* Name.Class */
+.highlight .no { color: #360 } /* Name.Constant */
+.highlight .nd { color: #99f } /* Name.Decorator */
+.highlight .ni { color: #999; } /* Name.Entity */
+.highlight .ne { color: #c00; } /* Name.Exception */
+.highlight .nf { color: #c0f } /* Name.Function */
+.highlight .nl { color: #99f } /* Name.Label */
+.highlight .nn { color: #0cf; } /* Name.Namespace */
+.highlight .nt { color: #2f6f9f; } /* Name.Tag */
+.highlight .nv { color: #033 } /* Name.Variable */
+.highlight .ow { color: #000; } /* Operator.Word */
+.highlight .w { color: #bbb } /* Text.Whitespace */
+.highlight .mf { color: #f60 } /* Literal.Number.Float */
+.highlight .mh { color: #f60 } /* Literal.Number.Hex */
+.highlight .mi { color: #f60 } /* Literal.Number.Integer */
+.highlight .mo { color: #f60 } /* Literal.Number.Oct */
+.highlight .sb { color: #c30 } /* Literal.String.Backtick */
+.highlight .sc { color: #c30 } /* Literal.String.Char */
+.highlight .sd { color: #c30; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #c30 } /* Literal.String.Double */
+.highlight .se { color: #c30; } /* Literal.String.Escape */
+.highlight .sh { color: #c30 } /* Literal.String.Heredoc */
+.highlight .si { color: #a00 } /* Literal.String.Interpol */
+.highlight .sx { color: #c30 } /* Literal.String.Other */
+.highlight .sr { color: #3aa } /* Literal.String.Regex */
+.highlight .s1 { color: #c30 } /* Literal.String.Single */
+.highlight .ss { color: #fc3 } /* Literal.String.Symbol */
+.highlight .bp { color: #366 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #033 } /* Name.Variable.Class */
+.highlight .vg { color: #033 } /* Name.Variable.Global */
+.highlight .vi { color: #033 } /* Name.Variable.Instance */
+.highlight .il { color: #f60 } /* Literal.Number.Integer.Long */
+
+.css .o,
+.css .o + .nt,
+.css .nt + .nt { color: #999; }
+  /*
+ *  __                  __
+ * /\ \                /\ \
+ * \ \ \___   __  __   \_\ \     __
+ *  \ \  _ `\/\ \/\ \  /'_` \  /'__`\
+ *   \ \ \ \ \ \ \_\ \/\ \_\ \/\  __/
+ *    \ \_\ \_\/`____ \ \___,_\ \____\
+ *     \/_/\/_/`/___/> \/__,_ /\/____/
+ *                /\___/
+ *                \/__/
+ *
+ * Designed, built, and released under MIT license by @mdo. Learn more at
+ * https://github.com/poole/hyde.
+ */
+
+
+/*
+ * Contents
+ *
+ * Global resets
+ * Sidebar
+ * Container
+ * Reverse layout
+ * Themes
+ */
+
+
+/*
+ * Global resets
+ *
+ * Update the foundational and global aspects of the page.
+ */
+
+html {
+  font-family: "PT Sans", Helvetica, Arial, sans-serif;
+}
+@media (min-width: 48em) {
+  html {
+    font-size: 16px;
+  }
+}
+@media (min-width: 58em) {
+  html {
+    font-size: 18px;
+  }
+}
+
+
+/*
+ * Sidebar
+ *
+ * Flexible banner for housing site name, intro, and "footer" content. Starts
+ * out above content in mobile and later moves to the side with wider viewports.
+ */
+
+.sidebar {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: rgba(255,255,255,.5);
+  background-color: #202020;
+}
+.sidebar-mini {
+  display: inline;
+}
+.sidebar-content {
+  display: none;
+}
+@media (min-width: 48em) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 18rem;
+    text-align: left;
+  }
+  .sidebar-mini {
+	display: none;
+  }
+  .sidebar-content {
+	display: inline;
+  }
+}
+
+/* Sidebar links */
+.sidebar a {
+  color: #fff;
+}
+
+/* Sidebar nav */
+.sidebar-nav {
+  margin-bottom: 1rem;
+}
+.sidebar-nav-item {
+  display: block;
+  line-height: 1.75;
+}
+a.sidebar-nav-item:hover,
+a.sidebar-nav-item:focus {
+  text-decoration: underline;
+}
+.sidebar-nav-item.active {
+  font-weight: bold;
+}
+
+/* Sticky sidebar
+ *
+ * Add the `sidebar-sticky` class to the sidebar's container to affix it the
+ * contents to the bottom of the sidebar in tablets and up.
+ */
+
+@media (min-width: 48em) {
+  .sidebar-sticky {
+    position: absolute;
+    right:  1rem;
+    bottom: 1rem;
+    left:   1rem;
+  }
+}
+
+
+/* Container
+ *
+ * Align the contents of the site above the proper threshold with some margin-fu
+ * with a 25%-wide `.sidebar`.
+ */
+
+.content {
+  padding-top:    4rem;
+  padding-bottom: 4rem;
+}
+
+@media (min-width: 48em) {
+  .content {
+    max-width: 38rem;
+    margin-left: 20rem;
+    margin-right: 2rem;
+  }
+}
+
+@media (min-width: 64em) {
+  .content {
+    max-width: 48rem;
+    margin-left: 22rem;
+    margin-right: 4rem;
+  }
+}
+
+
+/*
+ * Reverse layout
+ *
+ * Flip the orientation of the page by placing the `.sidebar` on the right.
+ */
+
+@media (min-width: 48em) {
+  .layout-reverse .sidebar {
+    left: auto;
+    right: 0;
+  }
+  .layout-reverse .content {
+    margin-left: 2rem;
+    margin-right: 20rem;
+  }
+}
+
+@media (min-width: 64em) {
+  .layout-reverse .content {
+    margin-left: 4rem;
+    margin-right: 22rem;
+  }
+}
+
+
+
+/*
+ * Themes
+ *
+ * As of v1.1, Hyde includes optional themes to color the sidebar and links
+ * within blog posts. To use, add the class of your choosing to the `body`.
+ */
+
+/* Base16 (http://chriskempson.github.io/base16/#default) */
+
+/* Red */
+.theme-base-08 .sidebar {
+  background-color: #ac4142;
+}
+.theme-base-08 .content a,
+.theme-base-08 .related-posts li a:hover {
+  color: #ac4142;
+}
+
+/* Orange */
+.theme-base-09 .sidebar {
+  background-color: #d28445;
+}
+.theme-base-09 .content a,
+.theme-base-09 .related-posts li a:hover {
+  color: #d28445;
+}
+
+/* Yellow */
+.theme-base-0a .sidebar {
+  background-color: #f4bf75;
+}
+.theme-base-0a .content a,
+.theme-base-0a .related-posts li a:hover {
+  color: #f4bf75;
+}
+
+/* Green */
+.theme-base-0b .sidebar {
+  background-color: #90a959;
+}
+.theme-base-0b .content a,
+.theme-base-0b .related-posts li a:hover {
+  color: #90a959;
+}
+
+/* Cyan */
+.theme-base-0c .sidebar {
+  background-color: #75b5aa;
+}
+.theme-base-0c .content a,
+.theme-base-0c .related-posts li a:hover {
+  color: #75b5aa;
+}
+
+/* Blue */
+.theme-base-0d .sidebar {
+  background-color: #6a9fb5;
+}
+.theme-base-0d .content a,
+.theme-base-0d .related-posts li a:hover {
+  color: #6a9fb5;
+}
+
+/* Magenta */
+.theme-base-0e .sidebar {
+  background-color: #aa759f;
+}
+.theme-base-0e .content a,
+.theme-base-0e .related-posts li a:hover {
+  color: #aa759f;
+}
+
+/* Brown */
+.theme-base-0f .sidebar {
+  background-color: #8f5536;
+}
+.theme-base-0f .content a,
+.theme-base-0f .related-posts li a:hover {
+  color: #8f5536;
+}
+
+  </style>
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="https://zeux.io/feed/">
+
+  
+</head>
+<body data-new-gr-c-s-check-loaded="14.1123.0" data-gr-ext-installed="">
+<div class="sidebar">
+  <div class="container">
+    <div class="sidebar-about">
+      <p class="lead"><a href="https://zeux.io/"><nobr>Bits, pixels, cycles and more</nobr></a></p>
+    </div>
+
+    
+    <div class="sidebar-mini">
+      Arseny&nbsp;Kapoulkine&nbsp;(<small><a href="mailto:arseny.kapoulkine@gmail.com">email</a>,&nbsp;<a href="https://mastodon.gamedev.place/@zeux">Mastodon</a></small>)
+    </div>
+
+    <div class="sidebar-content">
+    
+      <h4>Author</h4>
+      <p>
+      Arseny&nbsp;Kapoulkine&nbsp;(<small><a href="mailto:arseny.kapoulkine@gmail.com">email</a>,&nbsp;<a href="https://mastodon.gamedev.place/@zeux">Mastodon</a></small>)
+      </p>
+      <p>
+      <a href="https://zeux.io/about/">Work, projects and publications</a>
+      </p>
+
+      <h4>Posts</h4>
+      <p>
+      If you like this blog, you should follow it <a href="https://zeux.io/feed/">via RSS</a> and read <a href="https://zeux.io/archives/">older posts</a>. Here are the recent posts:
+      </p>
+      <ul style="padding-left: 20px;">
+      
+        <li>
+          <small><a href="https://zeux.io/2023/06/30/efficient-jagged-arrays/">Efficient jagged arrays</a></small>
+        </li>
+      
+        <li>
+          <small><a href="https://zeux.io/2023/04/28/triangle-backface-culling/">Fine-grained backface culling</a></small>
+        </li>
+      
+        <li>
+          <small><a href="https://zeux.io/2023/01/16/meshlet-size-tradeoffs/">Meshlet size tradeoffs</a></small>
+        </li>
+      
+        <li>
+          <small><a href="https://zeux.io/2023/01/12/approximate-projected-bounds/">Approximate projected bounds</a></small>
+        </li>
+      
+        <li>
+          <small><a href="https://zeux.io/2022/09/02/vpexpandb-neon-z3/">VPEXPANDB on NEON with Z3</a></small>
+        </li>
+      
+        <li>
+          <small><a href="https://zeux.io/2022/01/08/on-proebstings-law/">On Proebsting's Law</a></small>
+        </li>
+      
+        <li>
+          <small><a href="https://zeux.io/2020/08/02/eight-years-at-roblox/">Eight years at Roblox</a></small>
+        </li>
+      
+        <li>
+          <small><a href="https://zeux.io/2020/02/27/writing-an-efficient-vulkan-renderer/">Writing an efficient Vulkan renderer</a></small>
+        </li>
+      
+        <li>
+          <small><a href="https://zeux.io/2020/01/22/learning-from-data/">Learning from data</a></small>
+        </li>
+      
+        <li>
+          <small><a href="https://zeux.io/2019/12/12/three-years-of-metal/">Three years of Metal</a></small>
+        </li>
+      
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="content container">
+
+<table>
+<tbody><tr>
+ 
+<td style="border: 0; text-align: left;">
+<a class="prev" href="https://zeux.io/2016/12/01/metal-retrospective/">«&nbsp;Metal retrospective</a>
+</td>
+ 
+ 
+<td style="border: 0; text-align: right;">
+<a class="next" href="https://zeux.io/2017/07/31/optimal-grid-rendering-is-not-optimal/">Optimal grid rendering isn't optimal&nbsp;»</a>
+</td>
+ 
+</tr>
+</tbody></table>
+<div class="post">
+<h1 class="post-title">Voxel terrain: storage</h1>
+<span class="post-date">
+
+27 Mar 2017
+
+</span>
+<p>It’s been about almost two years since we shipped the first version of <a href="https://blog.roblox.com/2015/06/create-all-new-worlds-with-smooth-terrain/">smooth voxel terrain</a> at <a href="https://www.roblox.com/">Roblox</a>, and with it being live for a while and seeing a lot of incremental improvements I wanted to write about the internals of the technology - this feature required implementing serialization, network replication, collision detection, ray casting, rendering and in-memory storage support and within each area some implementation details ended up being quite interesting. Today we’ll talk about voxel definition and storage.</p>
+
+<!--more-->
+
+<p><img src="./zeux.io - Voxel terrain_ storage_files/voxstorage_0.jpg" alt="Prototype"></p>
+
+<h2 id="whats-in-a-voxel">What’s in a voxel?</h2>
+
+<p>Whenever you design a voxel system you have to answer a basic question - what defines a voxel? We wanted our terrain to implicitly define a mostly smooth surface with each point on the surface having a material value, so we could use some kind of contouring algorithm to generate polygons from the surface. Since it was important to have control over the surface in 3 dimensions (heightfield would not cut it), we needed to define the data that represents the surface. During a prototyping phase a few options became clear:</p>
+
+<ul>
+  <li>Material. In this model we’d store just a material (an enum value) per voxel, and rely on neighboring voxels to construct the surface.</li>
+  <li>Signed distance field. In this model we’d store the distance to the surface from the center of the voxel, with sign determining whether the center is outside or inside. This is a very well known model that’s frequently used to drive algorithms like Marching Cubes. We would also store the material per voxel.</li>
+  <li>Hermite data. In this model instead of storing data about voxels, you store data about the intersections between surface and grid edges. Assuming the surface only intersects each voxel edge at most once, you have to store a bit for every edge that defines whether surface intersects this edge, an intersection point (which is defined by a 0..1 scalar), surface normal at the intersection point and the material at the vertices.</li>
+  <li>Occupancy. In this model we’d store a material and the occupancy which defines the amount of matter around the voxel center - 0 meaning roughly that the voxel is completely empty and 1 meaning that the voxel is full.</li>
+</ul>
+
+<p><img src="./zeux.io - Voxel terrain_ storage_files/voxstorage_1.png" alt="Voxel models"></p>
+
+<p>We experimented with the material model and rejected it because it did not give us enough flexibility for tools - our voxels had to be pretty big for the solution to be practical for low end platforms, and thus we needed to be able to represent sub-voxel information (for example, to have a tool that can “erode” terrain on a scale much finer than a voxel size).</p>
+
+<p>Hermite data was very interesting - you could build pretty rich tooling based on boolean operations and allow a fine control over smoothness of the surface. However, what wasn’t clear was how we would present this to developers in a form of API. We felt like CSG-based API such as “subtract a sphere out of terrain” was not sufficient - how do you implement a smoothing tool if this is all you have? - and we wanted to give our developers an API that allows full control over the terrain data such that you can implement any tool with it (in fact, all our existing terrain manipulation tools are using the public terrain API and are written in Lua). We didn’t feel like exposing raw Hermite data was an option due to its complexity so we had to discard this approach.</p>
+
+<p>Signed distance field was more expressive than occupancy model, but ultimately resulted in similarly looking content and ended up having a more complicated mental model (how do I fill voxels that are far away from the surface? Does it even matter? How is the distance clamped? etc.) so we did not feel like it was worth the tradeoff.</p>
+
+<p>Thus we settled on the occupancy model, where every voxel would be defined by a material and occupancy pair. Our definition of occupancy is a bit peculiar because due to how our meshing algorithm works matter “overflows” from one voxel to another - occupancy 1 does not mean that the voxel looks like a cube, rather it just means that the voxel has as much matter as it can possibly contain. By discarding the Hermite model we lost an ability to precisely define sharp edges on the surface, which we decided to reclaim by using the material value - in addition to the texture that is applied the material also defines how terrain is shaped around the voxel; thus what defines geometry is the material and occupancy in the voxel and in voxel’s neighborhood. A screenshot from an early prototype shows how different materials with the same occupancy data can produce very different results:</p>
+
+<p><img src="./zeux.io - Voxel terrain_ storage_files/voxstorage_2.jpg" alt="Material based shaping"></p>
+
+<h2 id="memory-format">Memory format</h2>
+
+<p>To represent a voxel, you need a material (which is an enum) and occupancy (which is a floating-point value in 0..1 range). Material storage is straightforward - we just store an index into the material table, which currently has 23 entries. To conserve space, we store occupancy as a quantized 8-bit value, which adds up to two bytes per voxel.</p>
+
+<p>In a material-occupancy definition there is inherent ambiguity in terms of empty voxel representation - you can define it as occupancy = 0 but then the material choice does not matter; or you can define it as material = air but then the occupancy does not matter. We chose the model with an explicit <code class="language-plaintext highlighter-rouge">Air</code> material, and we decode occupancy as <code class="language-plaintext highlighter-rouge">(value + 1) / 256.0</code> for non-air materials and 0.0 for air materials (which means that the occupancy is precisely represented in a floating point number which is not true for decoding methods like <code class="language-plaintext highlighter-rouge">value / 255.0</code>). Voxels with material = <code class="language-plaintext highlighter-rouge">Air</code> and occupancy != 0 are not valid; we make sure they never appear in the grid with simple branchless code:</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// make sure occupancy is always 0 for Air material (0)</span>
+<span class="k">this</span><span class="o">-&gt;</span><span class="n">material</span> <span class="o">=</span> <span class="n">material</span><span class="p">;</span>
+<span class="k">this</span><span class="o">-&gt;</span><span class="n">occupancy</span> <span class="o">=</span> <span class="n">occupancy</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">-</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">material</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">31</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>When we originally developed the system, we decided to settle on a simple sparse storage format: all voxels would be stored in chunks 32x32x32 with each chunk represented as a linear 3D array (since each voxel needs two bytes for storage, this adds up to 64 KB per chunk; we also experimented with 16x16x16 chunks but the difference wasn’t very noticeable), and the entire voxel grid is simply a hash map, mapping the index of the chunk to the chunk contents itself:</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">HashMap</span><span class="o">&lt;</span><span class="n">Vector3int32</span><span class="p">,</span> <span class="n">Chunk</span><span class="o">&gt;</span> <span class="n">chunks</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>It’s worth noting that we needed a sparse unbounded storage because our worlds do not have set size limits and you can use voxel content at any point; of course, voxel access in a local region needed to be very fast. A simple two-level storage scheme (hash map + 3D array) turned out to work really well for this - it’s simple to implement and reason about, and provides an easy way to trade “sparseness” for increased locality by adjusting chunk size. We ended up using this way of storing voxel data throughout the entire engine, with individual systems adjusting the chunk size to match the expected workload better (storage uses 32^3 chunks, network uses 16^3 chunks for initial replication and 4^3 chunks for updates, physics uses 8^3 chunks, rendering first used 32x16x32 chunks and later switched to chunks that increase in size from 16^3 up to 256^3 voxels).</p>
+
+<p>Inside the chunk we ended up storing several 3D arrays - we call a 3D array of voxels “box” - of different sizes, forming a mipmap pyramid for our voxel content. We have 32^3 Box for the original content, and 16^3, 8^3 and 4^3 mipmaps that contain downsampled voxel data. The extra storage cost of mipmaps ends up being negligible, and the small penalty that we take for updating the mip levels when writing voxels to the voxel grid is well worth it considering that we are using them for Level Of Detail which allows us to render a lot fewer triangles in the distance, as well as for some other optimizations. The downsample algorithm that we use guarantees that if a voxel at a certain level of mip pyramid is filled with <code class="language-plaintext highlighter-rouge">Air</code>, all voxels corresponding to this area in the upper levels of the pyramid are also filled with <code class="language-plaintext highlighter-rouge">Air</code> - for example, if the bottom mip level has all 64 voxels empty then the entire chunk is empty.</p>
+
+<h2 id="disk-format">Disk format</h2>
+
+<p>When it comes to storing voxels on disk, we wanted a more compact representation than a 3D array. There are a lot of ways to store voxels - we needed an encoding scheme that stored voxels as bytes (without any cross-byte bit packing to avoid efficiency loss of a byte-level lossless compressor - we usually take the encoded voxels and compress them further with LZ4), was reasonably efficient on the types of content we see frequently, and was simple - we could always upgrade the format later if we needed to spend more time doing it.</p>
+
+<p>Our previous experiments in voxel technology suggested that if you take each chunk and do RLE compression on it, efficiently representing runs of voxels with the same contents, it resulted in pretty good compression rates and pretty efficient compression code. Remember, we don’t need to be optimal - we need to compress data to reduce it in size for storage efficiency, but we do frequently have a LZ codec running on top of that. Running RLE before LZ may seem counter-intuitive, but it significantly reduces the size of data making LZ faster, and in some cases means you don’t even need to do LZ compression because RLE on its own is enough - voxel data is frequently very regular.</p>
+
+<p>An additional quirk is that each voxel in our system occupies two bytes; we wanted to have a more compact baseline representation so that even if RLE can’t find runs of sufficient length we still end up with a smaller file. A key realization is that many voxels are completely solid - if you imagine a mountain built from voxels, usually all interior voxels in the mountain only carry material information (that is still meaningful in case you want to dig a hole through the mountain later) - occupancy is usually 1 for these cells. Similarly, for <code class="language-plaintext highlighter-rouge">Air</code> we <em>never</em> need to store occupancy - it’s always zero! With this and RLE in mind, here’s the encoding we came up with:</p>
+
+<p><img src="./zeux.io - Voxel terrain_ storage_files/voxstorage_3.png" alt="Byte RLE encoding"></p>
+
+<p>Each run of voxels starts with a byte that encodes the material (6 bits), whether we need to store the occupancy byte (1 bit) and whether we have a run length of more than one (1 bit). After this byte we store the occupancy value in a single byte (if the lead byte told us we needed it), followed by the run length in a single byte (if the lead byte told us we needed it). Since we encode single-voxel runs without a run length, we store run length minus one so that the longest run we can store is 256 voxels - we need to break up longer runs which is not a problem because you just need two bytes to encode a run as long as all voxels are solid or empty in case of <code class="language-plaintext highlighter-rouge">Air</code>.</p>
+
+<blockquote>
+  <p>Note that we only store count if we have more than one voxel in a run, so we could store <code class="language-plaintext highlighter-rouge">count-2</code> instead of <code class="language-plaintext highlighter-rouge">count-1</code>; storing <code class="language-plaintext highlighter-rouge">count-1</code> means that largest run is 256 voxels (which is a nice round number) and means we can use <code class="language-plaintext highlighter-rouge">0</code> later to extend the run format if necessary.</p>
+</blockquote>
+
+<p>This encoding results in compression ratios close to 2x even without RLE, and with RLE it’s anywhere between 2x and 30x for real-world content; the maximum efficiency is reached for chunks that use just one material and all voxels are solid or empty; we can encode a chunk like this in 128 2-byte runs, which brings us from 64 KB per chunk to just 256 bytes (and a few bytes of metadata such as chunk index).</p>
+
+<p>It’s definitely possible to improve on this encoding but this ended up working well for us. In addition to it serving as a file storage format, we also use it to compress undo history - whenever you perform an operation on the region of voxels, our undo system extracts the box of voxels from the grid before the operation, packs it using this encoding (the compression is extremely fast) and saves the result in case the user needs to undo the operation. We also use a variant of this with more aggressive bit packing and some other tweaks for network replication.</p>
+
+<h2 id="memory-format-take-two">Memory format, take two</h2>
+
+<p>After we shipped the first version of our voxel system and started seeing a lot of adoption among developers, we started working on different ways to optimize the system in terms of both memory and performance. This was when we implemented rendering LOD which uses the mipmap levels and substantially reduces both time to render terrain and also memory required to store terrain geometry. After this optimization the bulk of memory cost of new terrain became the voxel data - storing two bytes per voxel just wasn’t going to cut it for low-end mobile devices.</p>
+
+<p>At this point we had a lot of code written to assume that you can read a box of voxels from a terrain region and be able to iterate over the box very efficiently; some areas of the code went beyond reading a cell from a box one by one (which required two integer multiplications to compute the offset in a linear array) and used fast row access via a function like this:</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">const</span> <span class="n">Cell</span><span class="o">*</span> <span class="n">readRow</span><span class="p">(</span><span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">int</span> <span class="n">z</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>We wanted to store voxel data more efficiently but we did not want to compromise on the access performance - we were willing to make voxel writes a bit slower, but voxel reads - which are required by every subsystem that works with voxel data - had to stay fast, and for some inner loops it was important to be able to quickly iterate through a row of voxels. In addition to the amount of effort to extract a voxel from the box memory locality was also crucial - we considered using some complicated tree structure but ultimately decided against it.</p>
+
+<p>One obvious solution was to use our RLE scheme - keep chunks compressed in memory (either using pure RLE encoding or using LZ4 in addition to that), decompress on demand and keep a small cache of uncompressed chunks that are accessed frequently. This was a reasonable option but required to compromise on the read performance in case the chunk needed decompression - both LZ4 and our RLE decompressor are pretty fast but they are slower than just reading the memory, even after taking into account bandwidth savings. What we really wanted was a solution that allowed us to reduce chunk memory overhead but retain the read performance.</p>
+
+<p>One of the issues was the chunk size. For some content 32^3 chunks weren’t imposing too much overhead, but for simple terrain that had almost no variation in height but was very large in XZ dimension the requirement to store 32 voxels along the Y axis for every non-empty chunk increased the memory overhead substantially. Terrains of such large sizes were previously impractical because of the lack of rendering LOD, but now rendering could handle this just fine if not for the voxel memory overhead. Reducing chunk sizes too much made read operations slower because read requests for large regions had to look up many chunks in the hash, and also increased the overhead of chunk metadata we had to store (for a 8^3 chunk the size of raw voxel data is just 1 KB so even a few pointers can add up to several percent of memory).</p>
+
+<p>This is where we decided to use the ideas from our RLE packing to make a new in-memory compressed box representation. What worked well in RLE is packing each voxel in common cases into just one byte and assuming long contiguous runs of the same voxel data. If we now assume that these runs occupy full rows of data we can store chunks as follows:</p>
+
+<ul>
+  <li>Each row (32^3 chunk has 32^2 rows) is either allocated or not.</li>
+  <li>For unallocated rows, we store one byte - which represents the material value - and assume that all cells In this row are filled with this material and have “default” occupancy (1 for solid materials and 0 for air).</li>
+  <li>For allocated rows, we store an offset into cell data, which is a linear array that contains data for all allocated rows in an uncompressed fashion.</li>
+</ul>
+
+<p><img src="./zeux.io - Voxel terrain_ storage_files/voxstorage_4.png" alt="Row packed storage"></p>
+
+<p>You can see how for a typical chunk (the diagram above shows a 4^3 chunk for simplicity), most rows will not be allocated - in this case 10 are empty and 4 are filled with grass with occupancy 1 - and the remaining rows, 2 in this case, need extra storage to specify material and occupancy for every cell.</p>
+
+<p>In a 32^3 chunk we’d need up to 1024 allocated rows, which meant the row offset did not fit into one byte (it also doesn’t fit into one byte for 16^3 chunks because you need to dedicate some bits for the row state). There are some ways to work around the problem for 16^3 chunks but we decided to just use two bytes per row for the row header, which contains the “allocated” bit, and either the offset or the material value. To implement the function <code class="language-plaintext highlighter-rouge">readRow</code>, we have a global (read-only) array that contains pre-filled arrays of voxels for every material up to a certain chunk size, so we could implement the function like this:</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">const</span> <span class="n">Cell</span><span class="o">*</span> <span class="n">readRow</span><span class="p">(</span><span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">int</span> <span class="n">z</span><span class="p">)</span> <span class="k">const</span>
+<span class="p">{</span>
+    <span class="kt">uint16_t</span> <span class="n">row</span> <span class="o">=</span> <span class="n">rows</span><span class="p">[</span><span class="n">y</span> <span class="o">*</span> <span class="n">size</span> <span class="o">+</span> <span class="n">z</span><span class="p">];</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">row</span> <span class="o">&amp;</span> <span class="n">kRowTagAllocated</span><span class="p">)</span> <span class="o">?</span> <span class="n">rowdata</span> <span class="o">+</span> <span class="p">(</span><span class="n">row</span> <span class="o">&amp;</span> <span class="n">kRowTagMask</span><span class="p">)</span> <span class="o">*</span> <span class="n">size</span> <span class="o">:</span> <span class="n">gCellRows</span><span class="p">[</span><span class="n">row</span> <span class="o">&amp;</span> <span class="n">kRowTagMask</span><span class="p">];</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Notice that this is constant-time and also very very fast - the voxel read performance did not suffer as a result of this change (and instead improved since we need to read less memory).</p>
+
+<p>Writing becomes more complicated because we sometimes need to write cells into unallocated rows, which requires reallocating the cell content - we split the write workloads into two stages where the first stage marks the rows that will be written to, then we reallocate the chunk if necessary, and then actually perform the writes of new cell data. When we mark the rows we analyze the content we’re going to write there to keep the rows packed (unallocated) if possible. This resulted in code that was slower and more complicated, but voxel writes are relatively rare. There are some artificial cases in our scheme where repeatedly doing tiny writes can repack the chunk too many times - this is pretty simple to work around though because you can always pessimistically unpack the entire chunk at any point by allocating all rows.</p>
+
+<p>The worst case impact of this change is that we spend 2 bytes for every row in addition to whatever we had before, which adds 2 KB to a 64 KB chunk; most chunks have at least several rows compressed, and in some levels the impact is quite dramatic - for an extreme example, a layer of voxels that is just one voxel thick in Y dimension will have all rows unallocated which turns 64 KB chunks into 2 KB, reducing memory impact 32x. Of course the memory savings vary depending on the content - one nice side effect of this change is that the chunk size impacts memory much less because the packed representation does not spend extra memory for empty rows.</p>
+
+<h2 id="results-and-future-work">Results and future work</h2>
+
+<p>To give you some idea of the resulting sizes, these numbers were captured on a very large procedurally generated level with many biomes using different materials, with mountains, cliffs, canyons and caves; this level has about 1 billion non-empty voxels:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Storage</th>
+      <th>Size</th>
+      <th>Bytes per voxel</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Disk (RLE)</td>
+      <td>73 MB</td>
+      <td>0.07</td>
+    </tr>
+    <tr>
+      <td>Disk (RLE+LZ4)</td>
+      <td>50 MB</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <td>Disk (RLE+zstd)</td>
+      <td>38 MB</td>
+      <td>0.04</td>
+    </tr>
+    <tr>
+      <td>Network (bit-packed RLE)</td>
+      <td>59 MB</td>
+      <td>0.06</td>
+    </tr>
+    <tr>
+      <td>Memory #1 (unpacked)</td>
+      <td>2973 MB</td>
+      <td>2.97</td>
+    </tr>
+    <tr>
+      <td>Memory #2 (row packed)</td>
+      <td>488 MB</td>
+      <td>0.49</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Clearly RLE is very efficient at compressing this data; we do get further improvements using LZ4 but they are not very substantial, and the more valuable option is to employ entropy coding. What also works very well is using RLE and packing data a bit more tightly - this has an advantage that it compresses and decompresses data very quickly and requires no state so it works well for network packets where we only need to send a small chunk, although using byte packed RLE with a fast general compressor on top of it would also work well.</p>
+
+<p>Also note that, while with a naive chunked storage format we need more than 2 bytes per voxel to store data in memory with fast access (2 bytes per voxel would be optimal, but this is where the chunk size comes into play - the bigger the chunks are, the more memory you waste on empty voxels), our new row packed format reduces it by a factor of 6, which gives us 0.5 bytes per voxel and preserves very fast random access and linear read performance.</p>
+
+<p>None of the methods presented above are very complicated, but this is pretty much the point - the simpler the code that we ship ends up being, the easier it is to reason about its performance and behavior, and the easier it is to rework it later. Ultimately while there are ways to compress data better, and probably also ways to organize data for faster access, what we ended up with has a nice balance between performance, simplicity and compactness and solved the issues we had - compared to the raw storage, storing undo data as RLE compressed chunks and voxel data as row-packed chunks is significantly more efficient and does not have a noticeable performance impact on our workloads.</p>
+
+<p>We are pretty happy with the resulting solution; one thing to improve is that we currently send baseline mip level over the network, which means that for big levels it takes a lot of bandwidth to send data that’s so far away that rendering will not use the baseline mip for it anyway. Since we already have the mip data it makes a lot of sense to send it instead - which we haven’t done yet but definitely will do in the future. This mostly requires careful management of data that the client has or doesn’t have, and requires limiting the physics simulation to only work in the regions where we have the full resolution data, because our physics code uses it to generate collision data - which will be the topic for a following post.</p>
+
+<table>
+<tbody><tr>
+ 
+<td style="border: 0; text-align: left;">
+<a class="prev" href="https://zeux.io/2016/12/01/metal-retrospective/">«&nbsp;Metal retrospective</a>
+</td>
+ 
+ 
+<td style="border: 0; text-align: right;">
+<a class="next" href="https://zeux.io/2017/07/31/optimal-grid-rendering-is-not-optimal/">Optimal grid rendering isn't optimal&nbsp;»</a>
+</td>
+ 
+</tr>
+</tbody></table>
+<div id="disqus_thread" style="text-align: center">
+	<a href="https://zeux.io/2017/03/27/voxel-terrain-storage/#" onclick="disqus(); return false;">Show Comments</a>
+</div>
+
+<script type="text/javascript">
+    var disqus_shortname = 'zeuxcg';
+    var disqus_url = "https://zeux.io/2017/03/27/voxel-terrain-storage/";
+	var disqus_loaded = false;
+
+	function disqus() {
+		if (disqus_loaded) return;
+		disqus_loaded = true;
+
+		/* * * DON'T EDIT BELOW THIS LINE * * */
+		var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+		dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+		(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	}
+</script>
+
+	</div>
+	
+<script defer="" src="./zeux.io - Voxel terrain_ storage_files/v8b253dfea2ab4077af8c6f58422dfbfd1689876627854" integrity="sha512-bjgnUKX4azu3dLTVtie9u6TKqgx29RBwfj3QXYt5EKfWM/9hPSAI/4qcV5NACjwAo8UtTeWefx6Zq5PHcMm7Tg==" data-cf-beacon="{&quot;rayId&quot;:&quot;806606424a24b0f4&quot;,&quot;version&quot;:&quot;2023.8.0&quot;,&quot;r&quot;:1,&quot;token&quot;:&quot;4b7f5a93891f426e83db71b5c6b35488&quot;,&quot;si&quot;:100}" crossorigin="anonymous"></script>
+
+
+</div></body><grammarly-desktop-integration data-grammarly-shadow-root="true"><template shadowrootmode="open"><style>
+      div.grammarly-desktop-integration {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select:none;
+        user-select:none;
+      }
+
+      div.grammarly-desktop-integration:before {
+        content: attr(data-content);
+      }
+    </style><div aria-label="grammarly-integration" role="group" tabindex="-1" class="grammarly-desktop-integration" data-content="{&quot;mode&quot;:&quot;full&quot;,&quot;isActive&quot;:true,&quot;isUserDisabled&quot;:false}"></div></template></grammarly-desktop-integration></html>
